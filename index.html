@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Imaginería - Innovación Con Clase</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @media print {
+            .no-print { display: none; }
+            body { background: white; }
+            .print-break { page-break-after: always; }
+            .highlight-selection { background-color: #fef08a !important; border: 2px solid #eab308 !important; }
+        }
+        .highlight-selection {
+            background-color: #fef08a; /* Yellow-200 */
+            border: 2px solid #eab308; /* Yellow-500 */
+            transform: scale(1.02);
+            transition: all 0.3s ease;
+            font-weight: bold;
+            color: #1e1b4b;
+            z-index: 10;
+        }
+        .dice-active {
+            animation: shake 0.5s infinite;
+        }
+        @keyframes shake {
+            0% { transform: rotate(0deg); }
+            25% { transform: rotate(5deg); }
+            50% { transform: rotate(0deg); }
+            75% { transform: rotate(-5deg); }
+            100% { transform: rotate(0deg); }
+        }
+    </style>
+</head>
+<body class="bg-slate-50 font-sans text-slate-800">
+
+    <!-- Header con Logo -->
+    <header class="bg-indigo-700 text-white py-6 px-4 shadow-lg no-print">
+        <div class="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-center gap-6">
+            <img src="https://i.imgur.com/cjfV02r.png" 
+                 alt="Logo Innovación Con Clase" 
+                 class="h-20 w-auto bg-white p-2 rounded-lg shadow-inner"
+                 onerror="this.style.display='none'">
+            <div class="text-center md:text-left">
+                <h1 class="text-4xl font-bold tracking-tight">IMAGINERÍA</h1>
+                <p class="text-xl mt-1 font-light opacity-90 text-indigo-100 italic">Innovación Con Clase</p>
+            </div>
+        </div>
+    </header>
+
+    <!-- Versión del Header para Impresión -->
+    <div class="hidden print:flex items-center justify-between border-b-2 border-indigo-700 pb-4 mb-8">
+        <div>
+            <h1 class="text-3xl font-black text-indigo-700">IMAGINERÍA</h1>
+            <p class="text-lg font-bold text-slate-600">Innovación Con Clase</p>
+        </div>
+        <img src="https://i.imgur.com/cjfV02r.png" alt="Logo" class="h-16 w-auto" onerror="this.style.display='none'">
+    </div>
+
+    <main class="max-w-5xl mx-auto p-6 md:p-10">
+        
+        <!-- Instrucciones Section -->
+        <section class="mb-12 bg-white rounded-2xl p-8 shadow-sm border border-slate-200">
+            <h2 class="text-2xl font-bold text-indigo-700 mb-6 flex items-center">
+                <span class="bg-indigo-100 p-2 rounded-lg mr-3">📝</span> Indicaciones del Juego
+            </h2>
+            <div class="grid md:grid-cols-2 gap-8">
+                <div class="space-y-4">
+                    <div class="flex gap-4">
+                        <div class="font-bold text-white bg-indigo-500 w-8 h-8 flex items-center justify-center rounded-full shrink-0">1</div>
+                        <p><span class="font-bold text-indigo-900 underline decoration-indigo-200">Lanza D6:</span> Elige el grupo de sector (A1-A6).</p>
+                    </div>
+                    <div class="flex gap-4">
+                        <div class="font-bold text-white bg-indigo-500 w-8 h-8 flex items-center justify-center rounded-full shrink-0">2</div>
+                        <p><span class="font-bold text-indigo-900 underline decoration-indigo-200">Lanza D10:</span> Elige la opción del sector.</p>
+                    </div>
+                    <div class="flex gap-4">
+                        <div class="font-bold text-white bg-teal-500 w-8 h-8 flex items-center justify-center rounded-full shrink-0">3</div>
+                        <p><span class="font-bold text-teal-900 underline decoration-teal-200">Lanza D10:</span> Elige Necesidad Axiológica (B).</p>
+                    </div>
+                    <div class="flex gap-4">
+                        <div class="font-bold text-white bg-pink-500 w-8 h-8 flex items-center justify-center rounded-full shrink-0">4</div>
+                        <p><span class="font-bold text-pink-900 underline decoration-pink-200">Lanza D20:</span> Elige Tendencia de Consumo (C).</p>
+                    </div>
+                </div>
+                <div class="bg-indigo-50 p-6 rounded-xl border-l-4 border-indigo-500 italic">
+                    <p class="mb-4">"Cada integrante lanza y construye un reto de negocio con la combinación. El equipo debate y eligen la mejor."</p>
+                    <button onclick="window.print()" class="no-print bg-white text-indigo-700 font-bold py-2 px-4 rounded shadow hover:bg-indigo-100 transition flex items-center gap-2">
+                        🖨️ Imprimir Listas
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Dice Roller (Interactivo) -->
+        <section class="no-print mb-12 text-center bg-slate-100 p-8 rounded-3xl border-2 border-dashed border-slate-300">
+            <h3 class="text-sm font-bold text-slate-500 uppercase tracking-widest mb-6">Panel de Lanzamiento</h3>
+            <div class="flex flex-wrap justify-center gap-6">
+                <!-- Dado 6 (Grupo) -->
+                <div onclick="rollDice(6, 'd6-val', 'group')" class="cursor-pointer bg-white p-4 rounded-xl shadow-md hover:scale-105 transition border-b-4 border-indigo-500 w-28">
+                    <p class="text-[10px] font-bold text-indigo-500 leading-tight">D6: GRUPO SECTOR</p>
+                    <p id="d6-val" class="text-4xl font-black mt-1">?</p>
+                </div>
+                <!-- Dado 10 (Opción Sector) -->
+                <div onclick="rollDice(10, 'd10-opt-val', 'option')" class="cursor-pointer bg-white p-4 rounded-xl shadow-md hover:scale-105 transition border-b-4 border-indigo-400 w-28">
+                    <p class="text-[10px] font-bold text-indigo-400 leading-tight">D10: OPCIÓN SECTOR</p>
+                    <p id="d10-opt-val" class="text-4xl font-black mt-1">?</p>
+                </div>
+                <!-- Dado 10 (Necesidad) -->
+                <div onclick="rollDice(10, 'd10-val', 'need')" class="cursor-pointer bg-white p-4 rounded-xl shadow-md hover:scale-105 transition border-b-4 border-teal-500 w-28">
+                    <p class="text-[10px] font-bold text-teal-500 leading-tight">D10: NECESIDAD B</p>
+                    <p id="d10-val" class="text-4xl font-black mt-1">?</p>
+                </div>
+                <!-- Dado 20 (Tendencia) -->
+                <div onclick="rollDice(20, 'd20-val', 'trend')" class="cursor-pointer bg-white p-4 rounded-xl shadow-md hover:scale-105 transition border-b-4 border-pink-500 w-28">
+                    <p class="text-[10px] font-bold text-pink-500 leading-tight">D20: TENDENCIA C</p>
+                    <p id="d20-val" class="text-4xl font-black mt-1">?</p>
+                </div>
+            </div>
+            <p class="text-xs text-slate-400 mt-6">Haz clic en cada dado para generar tu combinación</p>
+        </section>
+
+        <!-- SECCIÓN A: SECTORES -->
+        <div class="print-break">
+            <h2 class="text-3xl font-black text-indigo-800 mb-6 text-center">A: SECTORES (Lanzar D6 y D10)</h2>
+            <div class="grid md:grid-cols-3 gap-4">
+                <!-- Grupos con IDs para selección -->
+                <div id="sector-group-1" class="bg-white p-4 rounded-lg shadow-sm border border-slate-200 transition-all duration-300">
+                    <h3 class="font-bold text-indigo-600 border-b pb-2 mb-2">1. Bienestar y Salud</h3>
+                    <ol class="text-sm space-y-1 list-decimal list-inside text-slate-600">
+                        <li id="s-1-1">Salud Mental</li><li id="s-1-2">Telemedicina Proactiva</li><li id="s-1-3">Longevidad y Biohacking</li><li id="s-1-4">Nutrición Personalizada</li><li id="s-1-5">Cuidado Adulto Mayor 2.0</li><li id="s-1-6">Medicina de Precisión</li><li id="s-1-7">Higiene del Sueño</li><li id="s-1-8">Salud Visual Digital</li><li id="s-1-9">Rehabilitación Inmersiva</li><li id="s-1-10">Diagnóstico preventivo</li>
+                    </ol>
+                </div>
+                <div id="sector-group-2" class="bg-white p-4 rounded-lg shadow-sm border border-slate-200 transition-all duration-300">
+                    <h3 class="font-bold text-indigo-600 border-b pb-2 mb-2">2. Tecnología y Futuro</h3>
+                    <ol class="text-sm space-y-1 list-decimal list-inside text-slate-600">
+                        <li id="s-2-1">Ciberseguridad cuántica</li><li id="s-2-2">Activos Digitales</li><li id="s-2-3">Agentes de IA Autónomos</li><li id="s-2-4">Computación Espacial</li><li id="s-2-5">Robótica de Servicio</li><li id="s-2-6">Sistemas Autogestionados</li><li id="s-2-7">Edge Computing</li><li id="s-2-8">Micro-credenciales (EdTech)</li><li id="s-2-9">Open Finance</li><li id="s-2-10">SaaS Inteligente</li>
+                    </ol>
+                </div>
+                <div id="sector-group-3" class="bg-white p-4 rounded-lg shadow-sm border border-slate-200 transition-all duration-300">
+                    <h3 class="font-bold text-indigo-600 border-b pb-2 mb-2">3. Sostenibilidad</h3>
+                    <ol class="text-sm space-y-1 list-decimal list-inside text-slate-600">
+                        <li id="s-3-1">Energía Distribuida</li><li id="s-3-2">Minería Urbana</li><li id="s-3-3">Biomateriales</li><li id="s-3-4">Agricultura Vertical</li><li id="s-3-5">Micro-movilidad</li><li id="s-3-6">Circularidad de Plásticos</li><li id="s-3-7">Captura de Carbono</li><li id="s-3-8">Infraestructura Esponja</li><li id="s-3-9">Regeneración de Suelos</li><li id="s-3-10">Consumo Cero Neto</li>
+                    </ol>
+                </div>
+                <div id="sector-group-4" class="bg-white p-4 rounded-lg shadow-sm border border-slate-200 transition-all duration-300">
+                    <h3 class="font-bold text-indigo-600 border-b pb-2 mb-2">4. Estilo de Vida</h3>
+                    <ol class="text-sm space-y-1 list-decimal list-inside text-slate-600">
+                        <li id="s-4-1">Turismo Regenerativo</li><li id="s-4-2">Food-tech (Sintéticos)</li><li id="s-4-3">Pet-Tech</li><li id="s-4-4">Interiorismo Sensorial</li><li id="s-4-5">Experiencias Híbridas</li><li id="s-4-6">Economía del Creador</li><li id="s-4-7">Cosmética Bio-idéntica</li><li id="s-4-8">Bienestar Holístico</li><li id="s-4-9">Hogar Conectado</li><li id="s-4-10">Nómadas de Propósito</li>
+                    </ol>
+                </div>
+                <div id="sector-group-5" class="bg-white p-4 rounded-lg shadow-sm border border-slate-200 transition-all duration-300">
+                    <h3 class="font-bold text-indigo-600 border-b pb-2 mb-2">5. Industria y Comercio</h3>
+                    <ol class="text-sm space-y-1 list-decimal list-inside text-slate-600">
+                        <li id="s-5-1">Comercio Social</li><li id="s-5-2">Logística Autónoma</li><li id="s-5-3">Manufactura Aditiva (3D)</li><li id="s-5-4">D2C (Directo al Humano)</li><li id="s-5-5">Membresías de Acceso</li><li id="s-5-6">Impacto Social</li><li id="s-5-7">Servicios Predictivos</li><li id="s-5-8">Artesanía Tecnológica</li><li id="s-5-9">Retail Experiencial</li><li id="s-5-10">Co-vivienda Colaborativa</li>
+                    </ol>
+                </div>
+                <div id="sector-group-6" class="bg-white p-4 rounded-lg shadow-sm border border-slate-200 transition-all duration-300">
+                    <h3 class="font-bold text-indigo-600 border-b pb-2 mb-2">6. Creatividad y Medios</h3>
+                    <ol class="text-sm space-y-1 list-decimal list-inside text-slate-600">
+                        <li id="s-6-1">Contenido Generativo</li><li id="s-6-2">E-sports y Meta-competencia</li><li id="s-6-3">Nuevas Narrativas</li><li id="s-6-4">Diseño Paramétrico</li><li id="s-6-5">V-Tubers e Identidades</li><li id="s-6-6">Marketing de Propósito</li><li id="s-6-7">Arquitectura de Prompt</li><li id="s-6-8">Experiencias de Audio</li><li id="s-6-9">Archivo Digital Personal</li><li id="s-6-10">Entretenimiento Inmersivo</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECCIÓN B Y C -->
+        <div class="mt-12 grid md:grid-cols-2 gap-8 print-break">
+            <!-- B: Necesidades Axiológicas -->
+            <section>
+                <h2 class="text-2xl font-black text-teal-700 mb-6 flex items-center">
+                    <span class="bg-teal-100 p-2 rounded mr-3">D10</span> B: Necesidades Axiológicas
+                </h2>
+                <div class="bg-white rounded-xl shadow-sm border border-teal-100 overflow-hidden">
+                    <table class="w-full text-sm">
+                        <thead class="bg-teal-50">
+                            <tr><th class="px-4 py-2 text-left">Dado</th><th class="px-4 py-2 text-left">Necesidad</th></tr>
+                        </thead>
+                        <tbody class="divide-y divide-teal-50">
+                            <tr id="need-1"><td class="px-4 py-2 font-bold">1</td><td class="px-4 py-2">Subsistencia (Salud, alimentación)</td></tr>
+                            <tr id="need-2"><td class="px-4 py-2 font-bold">2</td><td class="px-4 py-2">Protección (Cuidado, seguridad)</td></tr>
+                            <tr id="need-3"><td class="px-4 py-2 font-bold">3</td><td class="px-4 py-2">Afecto (Relaciones, privacidad)</td></tr>
+                            <tr id="need-4"><td class="px-4 py-2 font-bold">4</td><td class="px-4 py-2">Entendimiento (Educación, saber)</td></tr>
+                            <tr id="need-5"><td class="px-4 py-2 font-bold">5</td><td class="px-4 py-2">Participación (Cooperar, derecho)</td></tr>
+                            <tr id="need-6"><td class="px-4 py-2 font-bold">6</td><td class="px-4 py-2">Ocio (Curiosidad, juegos)</td></tr>
+                            <tr id="need-7"><td class="px-4 py-2 font-bold">7</td><td class="px-4 py-2">Creación (Habilidades, inventiva)</td></tr>
+                            <tr id="need-8"><td class="px-4 py-2 font-bold">8</td><td class="px-4 py-2">Identidad (Pertenencia, valores)</td></tr>
+                            <tr id="need-9"><td class="px-4 py-2 font-bold">9</td><td class="px-4 py-2">Libertad (Autonomía, elección)</td></tr>
+                            <tr id="need-10"><td class="px-4 py-2 font-bold">10</td><td class="px-4 py-2">Trascendencia (Propósito, legado)</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- C: Tendencias de Consumo -->
+            <section>
+                <h2 class="text-2xl font-black text-pink-700 mb-6 flex items-center">
+                    <span class="bg-pink-100 p-2 rounded mr-3">D20</span> C: Tendencias de Consumo
+                </h2>
+                <div class="bg-white rounded-xl shadow-sm border border-pink-100 overflow-hidden">
+                    <div class="max-h-[500px] overflow-y-auto">
+                        <table class="w-full text-sm">
+                            <thead class="bg-pink-50 sticky top-0">
+                                <tr><th class="px-4 py-2 text-left">Dado</th><th class="px-4 py-2 text-left">Tendencia (2026)</th></tr>
+                            </thead>
+                            <tbody class="divide-y divide-pink-50">
+                                <tr id="trend-1"><td class="px-4 py-2 font-bold">1</td><td class="px-4 py-2">Hiper-personalización algorítmica</td></tr>
+                                <tr id="trend-2"><td class="px-4 py-2 font-bold">2</td><td class="px-4 py-2">Comunidades de Co-vivienda</td></tr>
+                                <tr id="trend-3"><td class="px-4 py-2 font-bold">3</td><td class="px-4 py-2">Anti-consumo y De-influencia</td></tr>
+                                <tr id="trend-4"><td class="px-4 py-2 font-bold">4</td><td class="px-4 py-2">Salud Mental Aumentada</td></tr>
+                                <tr id="trend-5"><td class="px-4 py-2 font-bold">5</td><td class="px-4 py-2">Tribus de Propósito Digital</td></tr>
+                                <tr id="trend-6"><td class="px-4 py-2 font-bold">6</td><td class="px-4 py-2">Realidad Mixta (Phygital 2.0)</td></tr>
+                                <tr id="trend-7"><td class="px-4 py-2 font-bold">7</td><td class="px-4 py-2">Indulgencia Consciente</td></tr>
+                                <tr id="trend-8"><td class="px-4 py-2 font-bold">8</td><td class="px-4 py-2">Adaptación Climática Activa</td></tr>
+                                <tr id="trend-9"><td class="px-4 py-2 font-bold">9</td><td class="px-4 py-2">Agentes IA de Compañía</td></tr>
+                                <tr id="trend-10"><td class="px-4 py-2 font-bold">10</td><td class="px-4 py-2">Longevidad Activa (Silver Tech)</td></tr>
+                                <tr id="trend-11"><td class="px-4 py-2 font-bold">11</td><td class="px-4 py-2">Nostalgia Sintética (IA Recreativa)</td></tr>
+                                <tr id="trend-12"><td class="px-4 py-2 font-bold">12</td><td class="px-4 py-2">Micro-emprendimiento Masivo</td></tr>
+                                <tr id="trend-13"><td class="px-4 py-2 font-bold">13</td><td class="px-4 py-2">Hiper-localismo y Soberanía</td></tr>
+                                <tr id="trend-14"><td class="px-4 py-2 font-bold">14</td><td class="px-4 py-2">Gamificación de la Vida Real</td></tr>
+                                <tr id="trend-15"><td class="px-4 py-2 font-bold">15</td><td class="px-4 py-2">Soberanía de Datos Personales</td></tr>
+                                <tr id="trend-16"><td class="px-4 py-2 font-bold">16</td><td class="px-4 py-2">Bio-materiales de Consumo</td></tr>
+                                <tr id="trend-17"><td class="px-4 py-2 font-bold">17</td><td class="px-4 py-2">Economía de la Pausa (Slow Tech)</td></tr>
+                                <tr id="trend-18"><td class="px-4 py-2 font-bold">18</td><td class="px-4 py-2">Radical Transparencia ESG</td></tr>
+                                <tr id="trend-19"><td class="px-4 py-2 font-bold">19</td><td class="px-4 py-2">Identidades Digitales Múltiples</td></tr>
+                                <tr id="trend-20"><td class="px-4 py-2 font-bold">20</td><td class="px-4 py-2">Co-creación Humano-Máquina</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- Footer -->
+        <footer class="mt-16 text-center text-slate-400 text-sm border-t pt-8 pb-12">
+            <p>© 2026 Innovación Con Clase - Dinámica Imaginería</p>
+            <p>Diseñado para potenciar mentes creativas.</p>
+        </footer>
+    </main>
+
+    <script>
+        // Estado global de la selección actual
+        const currentSelection = {
+            group: 0,
+            option: 0,
+            need: 0,
+            trend: 0
+        };
+
+        function rollDice(sides, displayId, type) {
+            const el = document.getElementById(displayId);
+            const parent = el.parentElement;
+            
+            parent.classList.add('dice-active');
+            
+            let counter = 0;
+            const interval = setInterval(() => {
+                const val = Math.floor(Math.random() * sides) + 1;
+                el.innerText = val;
+                counter++;
+                
+                if (counter > 15) {
+                    clearInterval(interval);
+                    parent.classList.remove('dice-active');
+                    
+                    // Al finalizar, actualizamos la selección y marcamos el elemento
+                    const finalValue = parseInt(el.innerText);
+                    currentSelection[type] = finalValue;
+                    updateHighlights(type, finalValue);
+                }
+            }, 40);
+        }
+
+        function updateHighlights(type, value) {
+            // Limpiar resaltados previos segun el tipo
+            if (type === 'group' || type === 'option') {
+                // Si cambiamos grupo u opción, reseteamos todos los sectores
+                document.querySelectorAll('[id^="s-"], [id^="sector-group-"]').forEach(el => {
+                    el.classList.remove('highlight-selection');
+                });
+                
+                // Resaltar el grupo (D6)
+                if (currentSelection.group > 0) {
+                    const groupEl = document.getElementById(`sector-group-${currentSelection.group}`);
+                    if (groupEl) groupEl.classList.add('ring-4', 'ring-indigo-300', 'bg-indigo-50');
+                }
+
+                // Resaltar la opción específica (D10) solo si ambos dados fueron lanzados
+                if (currentSelection.group > 0 && currentSelection.option > 0) {
+                    const optionId = `s-${currentSelection.group}-${currentSelection.option}`;
+                    const optEl = document.getElementById(optionId);
+                    if (optEl) optEl.classList.add('highlight-selection');
+                }
+            } 
+            else if (type === 'need') {
+                document.querySelectorAll('[id^="need-"]').forEach(el => el.classList.remove('highlight-selection'));
+                const needEl = document.getElementById(`need-${value}`);
+                if (needEl) needEl.classList.add('highlight-selection');
+            } 
+            else if (type === 'trend') {
+                document.querySelectorAll('[id^="trend-"]').forEach(el => el.classList.remove('highlight-selection'));
+                const trendEl = document.getElementById(`trend-${value}`);
+                if (trendEl) {
+                    trendEl.classList.add('highlight-selection');
+                    trendEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            }
+        }
+    </script>
+</body>
+</html>
