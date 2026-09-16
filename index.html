@@ -96,7 +96,7 @@
                         ¡Bienvenido/a, <span id="banner-student-name" class="text-amber-300 underline font-black">Estudiante</span>!
                     </p>
                     <p class="text-xs text-indigo-200">
-                        Has ingresado al <span id="banner-group-code" class="font-bold text-white bg-indigo-700 px-2 py-0.5 rounded">G-01</span> (<span id="banner-team-name">Equipo</span>). Tu rol asignado es: <span id="banner-student-role" class="text-emerald-300 font-bold">Líder</span>.
+                        Has ingresado al <span id="banner-group-code" class="font-bold text-white bg-indigo-700 px-2 py-0.5 rounded">G-01</span> (<span id="banner-team-name">Equipo</span>) • Curso: <span id="banner-course-name" class="text-amber-300 font-bold">NRC-2026</span>. Tu rol asignado es: <span id="banner-student-role" class="text-emerald-300 font-bold">Líder</span>.
                     </p>
                 </div>
             </div>
@@ -163,17 +163,28 @@
                 </div>
 
                 <div class="space-y-5">
-                    <!-- Fila: Código de Grupo y Nombre del Equipo -->
-                    <div class="grid sm:grid-cols-3 gap-4">
+                    <!-- Fila: Curso/NRC, Código de Grupo y Nombre del Equipo -->
+                    <div class="grid sm:grid-cols-4 gap-3.5">
                         <div>
-                            <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">Código / Mesa *</label>
-                            <input type="text" id="input-group-code" value="G-01" placeholder="Ej: Grupo 01, Mesa 3"
-                                   class="w-full px-4 py-3 rounded-xl border border-slate-300 font-bold text-slate-900 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                            <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1 flex items-center gap-1">
+                                <span>🏷️</span> <span>Curso / NRC *</span>
+                            </label>
+                            <input type="text" id="input-course-name" value="NRC-2026" placeholder="Ej: NRC 4520, Diurno A"
+                                   class="w-full px-3.5 py-3 rounded-xl border border-slate-300 font-bold text-indigo-900 bg-indigo-50/40 focus:ring-2 focus:ring-indigo-500 focus:outline-none text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1 flex items-center gap-1">
+                                <span>🔢</span> <span>Código / Mesa *</span>
+                            </label>
+                            <input type="text" id="input-group-code" value="G-01" placeholder="Ej: G-01"
+                                   class="w-full px-3.5 py-3 rounded-xl border border-slate-300 font-bold text-slate-900 focus:ring-2 focus:ring-indigo-500 focus:outline-none text-sm">
                         </div>
                         <div class="sm:col-span-2">
-                            <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">Nombre del Equipo *</label>
+                            <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1 flex items-center gap-1">
+                                <span>🚀</span> <span>Nombre del Equipo *</span>
+                            </label>
                             <input type="text" id="input-team-name" value="Equipo Innovadores" placeholder="Nombre creativo del equipo"
-                                   class="w-full px-4 py-3 rounded-xl border border-slate-300 font-bold text-slate-900 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                                   class="w-full px-3.5 py-3 rounded-xl border border-slate-300 font-bold text-slate-900 focus:ring-2 focus:ring-indigo-500 focus:outline-none text-sm">
                         </div>
                     </div>
 
@@ -885,9 +896,15 @@
                 <!-- PESTAÑA 2: ENLACES PERSONALIZADOS E INSTRUCCIONES -->
                 <div id="admin-tab-content-2" class="space-y-6 hidden">
                     <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
-                        <div class="flex-1">
-                            <label class="text-xs font-bold text-slate-700 block mb-1">🔗 URL Base de la Aplicación (para generar los enlaces):</label>
-                            <input id="admin-base-url" type="text" class="w-full text-xs font-mono p-2.5 bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none" placeholder="https://mi-servidor.com/index.html">
+                        <div class="flex-1 grid sm:grid-cols-2 gap-3">
+                            <div>
+                                <label class="text-xs font-bold text-slate-700 block mb-1">🏷️ Curso / NRC Activo para los Enlaces:</label>
+                                <input id="admin-course-input" type="text" oninput="updateAdminCourse(this.value)" class="w-full text-xs font-bold p-2.5 bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none" placeholder="Ej: NRC-4520">
+                            </div>
+                            <div>
+                                <label class="text-xs font-bold text-slate-700 block mb-1">🔗 URL Base de la Aplicación:</label>
+                                <input id="admin-base-url" type="text" class="w-full text-xs font-mono p-2.5 bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none" placeholder="https://mi-servidor.com/index.html">
+                            </div>
                         </div>
                         <div class="flex flex-wrap items-center gap-2 shrink-0 pt-2 md:pt-4">
                             <button onclick="copyAllGroupsMessage()" class="bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold px-4 py-2.5 rounded-xl shadow transition flex items-center gap-1.5">
@@ -1170,6 +1187,7 @@
         const STORAGE_KEY = "imagineria_innovacion_v2";
 
         let workshopState = {
+            courseName: "NRC-2026",
             groupCode: "G-01",
             teamName: "Equipo Innovadores",
             appsScriptUrl: "https://script.google.com/macros/s/AKfycbyswH779w7PXOi8UCAYwm7ADgiCReG_WRTYY2yIxIKj5OTkTQi8y9qhHfuSeBs2ljvoJw/exec",
@@ -1214,6 +1232,7 @@
         // -------------------------------------------------------------
         const ADMIN_STORAGE_KEY = "imagineria_admin_groups_v2";
         let adminState = {
+            courseName: "NRC-2026",
             rosterRaw: "",
             groups: [],
             baseUrl: "",
@@ -1341,6 +1360,17 @@
 
             let modified = false;
 
+            const courseParam = params.get('curso') || params.get('course') || params.get('nrc');
+            if (courseParam) {
+                workshopState.courseName = courseParam.trim();
+                adminState.courseName = courseParam.trim();
+                const courseInp = document.getElementById('input-course-name');
+                if (courseInp) courseInp.value = workshopState.courseName;
+                const adminCourseInp = document.getElementById('admin-course-input');
+                if (adminCourseInp) adminCourseInp.value = workshopState.courseName;
+                modified = true;
+            }
+
             if (groupParam) {
                 workshopState.groupCode = groupParam.trim();
                 const codeInp = document.getElementById('input-group-code');
@@ -1404,12 +1434,14 @@
                 const bGroup = document.getElementById('banner-group-code');
                 const bTeam = document.getElementById('banner-team-name');
                 const bRole = document.getElementById('banner-student-role');
+                const bCourse = document.getElementById('banner-course-name');
 
                 if (banner && bName && bGroup && bRole) {
                     bName.innerText = sName;
                     bGroup.innerText = workshopState.groupCode;
                     bTeam.innerText = workshopState.teamName;
                     bRole.innerText = workshopState.participants[foundIndex].role || 'Participante';
+                    if (bCourse) bCourse.innerText = workshopState.courseName || 'General';
                     banner.classList.remove('hidden');
                 }
             }
@@ -1467,6 +1499,11 @@
                 rosterTextarea.value = adminState.rosterRaw;
             }
 
+            const courseInp = document.getElementById('admin-course-input');
+            if (courseInp) {
+                courseInp.value = adminState.courseName || workshopState.courseName || 'NRC-2026';
+            }
+
             updateAdminRosterStats();
             renderAdminGroups();
             modal.classList.remove('hidden');
@@ -1474,6 +1511,20 @@
 
         function closeAdminModal() {
             document.getElementById('admin-modal').classList.add('hidden');
+        }
+
+        function updateAdminCourse(val) {
+            const clean = (val || '').trim();
+            adminState.courseName = clean;
+            workshopState.courseName = clean;
+            const p1Course = document.getElementById('input-course-name');
+            if (p1Course) p1Course.value = clean;
+            const bCourse = document.getElementById('banner-course-name');
+            if (bCourse) bCourse.innerText = clean || 'General';
+            saveAdminStateToStorage();
+            if (adminState.groups && adminState.groups.length > 0) {
+                renderAdminGroups();
+            }
         }
 
         function switchAdminTab(tabIndex) {
@@ -1699,6 +1750,8 @@
             const baseUrl = getAppBaseUrl();
             const sep = baseUrl.includes('?') ? '&' : '?';
             const params = new URLSearchParams();
+            const activeCourse = (adminState.courseName || workshopState.courseName || '').trim();
+            if (activeCourse) params.set('curso', activeCourse);
             params.set('group', groupCode);
             if (studentName) params.set('student', studentName);
             if (teamName) params.set('team', teamName);
@@ -1837,10 +1890,12 @@
         }
 
         function copyStudentMessage(groupCode, studentName, studentRole, teamName) {
+            const courseStr = (adminState.courseName || workshopState.courseName || '').trim();
+            const courseLine = courseStr ? `📚 *Curso / NRC:* ${courseStr}\n` : '';
             const link = buildStudentDirectLink(groupCode, studentName, teamName);
             const msg = 
 `🚀 *TALLER DE INNOVACIÓN - GERENCIA DE LA INNOVACIÓN*
-¡Hola, ${studentName}! Has sido asignado/a al *Grupo ${groupCode}* (${teamName}).
+${courseLine}¡Hola, ${studentName}! Has sido asignado/a al *Grupo ${groupCode}* (${teamName}).
 🎯 Tu rol en el equipo: *${studentRole}*
 
 👉 *Haz clic aquí para entrar directamente a tu taller:*
@@ -1859,9 +1914,12 @@ ${link}
             const group = adminState.groups.find(g => g.code === groupCode);
             if (!group) return;
 
+            const courseStr = (adminState.courseName || workshopState.courseName || '').trim();
+            const courseLine = courseStr ? `📚 *Curso / NRC:* ${courseStr}\n` : '';
+
             let lines = [
 `🚀 *TALLER DE INNOVACIÓN - CONVOCATORIA GRUPO ${group.code}*
-Equipo: *${group.teamName}*
+${courseLine}Equipo: *${group.teamName}*
 
 👥 *INTEGRANTES Y ENLACES DE ACCESO:*`
             ];
@@ -1890,10 +1948,13 @@ Equipo: *${group.teamName}*
                 return;
             }
 
+            const courseStr = (adminState.courseName || workshopState.courseName || '').trim();
+            const courseHeader = courseStr ? `Curso / NRC: ${courseStr}\n` : '';
+
             let lines = [
 `🎓 *DISTRIBUCIÓN OFICIAL DE GRUPOS - TALLER DE INNOVACIÓN*
 Asignatura: Gerencia de la Innovación
-
+${courseHeader}
 Cada participante debe buscar su nombre, hacer clic en su enlace personalizado y comenzar el taller con su equipo:
 ----------------------------------------`
             ];
@@ -1913,6 +1974,14 @@ Cada participante debe buscar su nombre, hacer clic en su enlace personalizado y
         function loadGroupIntoCurrentWorkshop(groupCode) {
             const group = adminState.groups.find(g => g.code === groupCode);
             if (!group) return;
+
+            if (adminState.courseName) {
+                workshopState.courseName = adminState.courseName;
+                const cInp = document.getElementById('input-course-name');
+                if (cInp) cInp.value = adminState.courseName;
+                const bCourse = document.getElementById('banner-course-name');
+                if (bCourse) bCourse.innerText = adminState.courseName;
+            }
 
             workshopState.groupCode = group.code;
             workshopState.teamName = group.teamName;
@@ -1969,6 +2038,7 @@ Cada participante debe buscar su nombre, hacer clic en su enlace personalizado y
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         action: 'saveGroups',
+                        course: adminState.courseName || workshopState.courseName || '',
                         groups: adminState.groups
                     })
                 });
@@ -2021,6 +2091,7 @@ Cada participante debe buscar su nombre, hacer clic en su enlace personalizado y
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
                             action: 'saveGroups',
+                            course: adminState.courseName || workshopState.courseName || '',
                             groups: adminState.groups
                         })
                     });
@@ -2033,6 +2104,7 @@ Cada participante debe buscar su nombre, hacer clic en su enlace personalizado y
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         action: 'sendInvites',
+                        course: adminState.courseName || workshopState.courseName || '',
                         appUrl: appBaseUrl
                     })
                 });
@@ -2071,6 +2143,10 @@ Cada participante debe buscar su nombre, hacer clic en su enlace personalizado y
                     const p = JSON.parse(raw);
                     if (p && p.participants && p.participants.length === 4) {
                         workshopState = p;
+                        const courseInp = document.getElementById('input-course-name');
+                        if (courseInp && workshopState.courseName) {
+                            courseInp.value = workshopState.courseName;
+                        }
                         document.getElementById('input-group-code').value = workshopState.groupCode || 'G-01';
                         document.getElementById('input-team-name').value = workshopState.teamName;
                         if (!workshopState.appsScriptUrl) {
@@ -2128,7 +2204,8 @@ Cada participante debe buscar su nombre, hacer clic en su enlace personalizado y
                 }
             }
 
-            document.getElementById('header-team-title').innerText = `${workshopState.groupCode} • ${workshopState.teamName} • Fase ${phaseNumber} de 5`;
+            const courseTag = workshopState.courseName ? `[${workshopState.courseName}] ` : '';
+            document.getElementById('header-team-title').innerText = `${courseTag}${workshopState.groupCode} • ${workshopState.teamName} • Fase ${phaseNumber} de 5`;
 
             if (phaseNumber === 2) {
                 renderParticipantTabs();
@@ -2149,6 +2226,10 @@ Cada participante debe buscar su nombre, hacer clic en su enlace personalizado y
         // FASE 1: REGISTRO
         // -------------------------------------------------------------
         function startWorkshop() {
+            const courseInp = document.getElementById('input-course-name');
+            if (courseInp && courseInp.value.trim()) {
+                workshopState.courseName = courseInp.value.trim();
+            }
             workshopState.groupCode = document.getElementById('input-group-code').value.trim() || 'G-01';
             workshopState.teamName = document.getElementById('input-team-name').value.trim() || 'Equipo Innovadores';
             workshopState.appsScriptUrl = document.getElementById('input-apps-script-url').value.trim();
@@ -2188,7 +2269,9 @@ Cada participante debe buscar su nombre, hacer clic en su enlace personalizado y
             }
 
             try {
-                const res = await fetch(url);
+                const activeCourse = (workshopState.courseName || '').trim();
+                const fetchUrl = activeCourse ? `${url}${url.includes('?') ? '&' : '?'}curso=${encodeURIComponent(activeCourse)}` : url;
+                const res = await fetch(fetchUrl);
                 const data = await res.json();
 
                 if (data.status === 'success' && data.groups) {
@@ -2791,7 +2874,7 @@ Cada participante debe buscar su nombre, hacer clic en su enlace personalizado y
                         <div class="flex items-center gap-3">
                             <img src="${BRAND_LOGO_BASE64}" alt="Logo Innovación Con Clase" class="h-11 w-auto object-contain bg-white rounded p-0.5" />
                             <div class="border-l border-slate-300 pl-3">
-                                <span class="text-[10px] font-black uppercase tracking-widest text-indigo-700 block leading-tight">Materia: Gerencia de la Innovación</span>
+                                <span class="text-[10px] font-black uppercase tracking-widest text-indigo-700 block leading-tight">Materia: Gerencia de la Innovación • Curso / NRC: ${escapeHtml(workshopState.courseName || 'General')}</span>
                                 <h1 class="text-base sm:text-lg font-black text-slate-900 tracking-tight leading-snug">INFORME DE IDEACIÓN Y ACTA DE PROYECTO</h1>
                                 <p class="text-[11px] text-slate-500 font-medium">Metodología de Innovación Combinatoria con Dados (Imaginería)</p>
                             </div>
@@ -2800,6 +2883,7 @@ Cada participante debe buscar su nombre, hacer clic en su enlace personalizado y
                             <span class="inline-block bg-indigo-900 text-white font-black px-3 py-1 rounded text-xs tracking-wider">${escapeHtml(workshopState.groupCode || 'G-01')}</span>
                             <p class="text-slate-500 mt-1 font-semibold text-[10px]">${dateStr}</p>
                             <p class="text-indigo-900 font-bold text-[10px] truncate max-w-[140px]">${escapeHtml(workshopState.teamName || 'Equipo')}</p>
+                            <p class="text-indigo-700 font-bold text-[9px] bg-indigo-50 px-1.5 py-0.5 rounded inline-block mt-0.5 border border-indigo-100">${escapeHtml(workshopState.courseName || 'NRC-2026')}</p>
                         </div>
                     </div>
 
@@ -2807,7 +2891,7 @@ Cada participante debe buscar su nombre, hacer clic en su enlace personalizado y
                     <div class="report-card print-avoid-break bg-slate-50 border border-slate-200 p-3.5 rounded-xl">
                         <div class="flex items-center justify-between border-b border-slate-200 pb-2 mb-2.5">
                             <h3 class="font-bold text-slate-900 text-xs uppercase tracking-wider flex items-center gap-1.5">
-                                <span>👥</span> <span>1. Datos del Equipo: "${escapeHtml(workshopState.teamName || 'Equipo')}"</span>
+                                <span>👥</span> <span>1. Datos del Equipo: "${escapeHtml(workshopState.teamName || 'Equipo')}" [${escapeHtml(workshopState.courseName || 'NRC-2026')}]</span>
                             </h3>
                             <span class="text-[10px] text-slate-500 font-medium">${workshopState.participants.length} Integrantes Formalizados</span>
                         </div>
@@ -2967,9 +3051,10 @@ Cada participante debe buscar su nombre, hacer clic en su enlace personalizado y
 
             document.body.appendChild(sandbox);
 
+            const courseClean = (workshopState.courseName || 'NRC2026').replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_-]/g, '');
             const groupClean = (workshopState.groupCode || 'G01').replace(/[^a-zA-Z0-9_-]/g, '');
             const teamClean = (workshopState.teamName || 'Equipo').replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_-]/g, '');
-            const filename = `Informe_Innovacion_${groupClean}_${teamClean}.pdf`;
+            const filename = `Informe_${courseClean}_${groupClean}_${teamClean}.pdf`;
 
             const opt = {
                 margin:       [8, 10, 8, 10], // mm: superior, izquierdo, inferior, derecho
@@ -3027,6 +3112,7 @@ Cada participante debe buscar su nombre, hacer clic en su enlace personalizado y
             const winner = workshopState.participants.find(p => p.id === winnerId);
 
             const payload = {
+                course: workshopState.courseName || '',
                 groupCode: workshopState.groupCode,
                 teamName: workshopState.teamName,
                 projectJustification: workshopState.projectJustification,
