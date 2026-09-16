@@ -14,16 +14,22 @@
     <style>
         @page {
             size: A4 portrait;
-            margin: 12mm 15mm;
+            margin: 10mm 12mm;
         }
 
         @media print {
             .no-print { display: none !important; }
-            body { background: white !important; color: #111827 !important; font-size: 11pt; }
+            body { background: white !important; color: #111827 !important; font-size: 10pt; margin: 0 !important; padding: 0 !important; }
             .print-only { display: block !important; }
-            .print-page-break { page-break-after: always; }
-            .print-avoid-break { break-inside: avoid; page-break-inside: avoid; }
+            .print-page-break { page-break-after: always; break-after: always; }
+            .print-avoid-break, .report-card, tr, table { break-inside: avoid !important; page-break-inside: avoid !important; }
             .report-box { border: 1px solid #cbd5e1 !important; box-shadow: none !important; }
+        }
+
+        /* Reglas de corte de página tanto para exportación html2pdf como impresión nativa */
+        .print-avoid-break, .report-card, tr, table {
+            break-inside: avoid !important;
+            page-break-inside: avoid !important;
         }
 
         .print-only { display: none; }
@@ -51,10 +57,10 @@
     <header class="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white py-4 px-4 shadow-md no-print sticky top-0 z-30">
         <div class="max-w-6xl mx-auto flex flex-wrap items-center justify-between gap-4">
             <div class="flex items-center gap-4">
-                <img src="https://i.imgur.com/cjfV02r.png" 
+                <img id="header-app-logo" src="https://i.imgur.com/cjfV02r.png" 
                      alt="Logo Innovación Con Clase" 
                      class="h-12 w-auto bg-white p-1.5 rounded-lg shadow-inner"
-                     onerror="this.style.display='none'">
+                     onerror="if(typeof BRAND_LOGO_BASE64 !== 'undefined') this.src=BRAND_LOGO_BASE64;">
                 <div>
                     <div class="flex items-center gap-2">
                         <h1 class="text-2xl font-black tracking-tight">IMAGINERÍA</h1>
@@ -2751,138 +2757,167 @@ Cada participante debe buscar su nombre, hacer clic en su enlace personalizado y
         }
 
         // -------------------------------------------------------------
+        // LOGO OFICIAL EN FORMATO BASE64 (100% DISPONIBLE OFFLINE Y SIN CORS)
+        // -------------------------------------------------------------
+        const BRAND_LOGO_BASE64 = "data:image/png;base64,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";
+
+        // -------------------------------------------------------------
         // GENERACIÓN DEL INFORME FORMAL Y EXPORTACIÓN A PDF
         // -------------------------------------------------------------
         function buildReportHTML() {
             const { voteCounts, winnerId, maxVotes } = calculateResults();
-            const winner = workshopState.participants.find(p => p.id === winnerId);
+            const winner = (workshopState.participants && workshopState.participants.find(p => p.id === winnerId)) || 
+                           (workshopState.participants && workshopState.participants[0]) || {
+                               id: 1,
+                               name: 'Integrante 1',
+                               role: 'Líder de Proyecto',
+                               dice: { group: 1, option: 1, need: 1, trend: 1 },
+                               idea: { title: 'Propuesta de Innovación', description: 'Por definir en el taller', target: 'Público general' }
+                           };
             const dateStr = new Date().toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' });
 
-            const sObj = (winner.dice.group > 0 && winner.dice.option > 0) ? SECTORS_DATA[winner.dice.group].options[winner.dice.option - 1] : null;
+            const sObj = (winner.dice && winner.dice.group > 0 && winner.dice.option > 0 && SECTORS_DATA[winner.dice.group]) 
+                ? SECTORS_DATA[winner.dice.group].options[winner.dice.option - 1] : null;
             const sText = sObj ? `${sObj.name} (${sObj.desc})` : 'No especificado';
-            const nText = winner.dice.need > 0 ? NEEDS_DATA[winner.dice.need - 1] : 'No especificada';
-            const tText = winner.dice.trend > 0 ? TRENDS_DATA[winner.dice.trend - 1] : 'No especificada';
+            const nText = (winner.dice && winner.dice.need > 0 && NEEDS_DATA[winner.dice.need - 1]) 
+                ? NEEDS_DATA[winner.dice.need - 1] : 'No especificada';
+            const tText = (winner.dice && winner.dice.trend > 0 && TRENDS_DATA[winner.dice.trend - 1]) 
+                ? TRENDS_DATA[winner.dice.trend - 1] : 'No especificada';
 
             return `
-                <div class="space-y-6">
-                    <!-- Encabezado Institucional -->
-                    <div class="border-b-2 border-indigo-900 pb-4 flex items-center justify-between">
-                        <div>
-                            <span class="text-[10px] font-black uppercase tracking-widest text-indigo-700">Materia: Gerencia de la Innovación</span>
-                            <h1 class="text-xl font-black text-slate-900">INFORME DE IDEACIÓN Y ACTA DE PROYECTO</h1>
-                            <p class="text-xs text-slate-600 font-medium">Metodología de Innovación Combinatoria con Dados (Imaginería)</p>
+                <div class="space-y-4 text-slate-900" style="margin: 0; padding: 0;">
+                    <!-- Encabezado Institucional con Logo Oficial -->
+                    <div class="report-card print-avoid-break border-b-2 border-indigo-900 pb-3 flex items-center justify-between gap-4">
+                        <div class="flex items-center gap-3">
+                            <img src="${BRAND_LOGO_BASE64}" alt="Logo Innovación Con Clase" class="h-11 w-auto object-contain bg-white rounded p-0.5" />
+                            <div class="border-l border-slate-300 pl-3">
+                                <span class="text-[10px] font-black uppercase tracking-widest text-indigo-700 block leading-tight">Materia: Gerencia de la Innovación</span>
+                                <h1 class="text-base sm:text-lg font-black text-slate-900 tracking-tight leading-snug">INFORME DE IDEACIÓN Y ACTA DE PROYECTO</h1>
+                                <p class="text-[11px] text-slate-500 font-medium">Metodología de Innovación Combinatoria con Dados (Imaginería)</p>
+                            </div>
                         </div>
-                        <div class="text-right text-xs">
-                            <span class="bg-indigo-900 text-white font-bold px-2.5 py-1 rounded text-[11px]">${escapeHtml(workshopState.groupCode)}</span>
-                            <p class="text-slate-500 mt-1 font-medium text-[10px]">${dateStr}</p>
+                        <div class="text-right shrink-0">
+                            <span class="inline-block bg-indigo-900 text-white font-black px-3 py-1 rounded text-xs tracking-wider">${escapeHtml(workshopState.groupCode || 'G-01')}</span>
+                            <p class="text-slate-500 mt-1 font-semibold text-[10px]">${dateStr}</p>
+                            <p class="text-indigo-900 font-bold text-[10px] truncate max-w-[140px]">${escapeHtml(workshopState.teamName || 'Equipo')}</p>
                         </div>
                     </div>
 
-                    <!-- Datos del Equipo y Roles -->
-                    <div class="bg-slate-50 border border-slate-200 p-4 rounded-xl">
-                        <div class="flex items-center justify-between border-b border-slate-200 pb-2 mb-3">
-                            <h3 class="font-bold text-slate-900 text-xs uppercase tracking-wider">1. Datos del Equipo: "${escapeHtml(workshopState.teamName)}"</h3>
-                            <span class="text-[10px] text-slate-500 font-medium">4 Integrantes Formalizados</span>
+                    <!-- 1. Datos del Equipo y Roles Asignados -->
+                    <div class="report-card print-avoid-break bg-slate-50 border border-slate-200 p-3.5 rounded-xl">
+                        <div class="flex items-center justify-between border-b border-slate-200 pb-2 mb-2.5">
+                            <h3 class="font-bold text-slate-900 text-xs uppercase tracking-wider flex items-center gap-1.5">
+                                <span>👥</span> <span>1. Datos del Equipo: "${escapeHtml(workshopState.teamName || 'Equipo')}"</span>
+                            </h3>
+                            <span class="text-[10px] text-slate-500 font-medium">${workshopState.participants.length} Integrantes Formalizados</span>
                         </div>
-                        <div class="grid grid-cols-2 gap-3 text-xs">
+                        <div class="grid grid-cols-2 gap-2.5 text-xs">
                             ${workshopState.participants.map((p, i) => `
-                                <div class="border-l-2 border-indigo-600 pl-2 py-0.5">
-                                    <p class="font-bold text-slate-900">${i+1}. ${escapeHtml(p.name)}</p>
-                                    <p class="text-[10px] text-slate-500">${escapeHtml(p.email || 'Sin correo')}</p>
-                                    <p class="text-[10px] font-semibold text-indigo-700 mt-0.5">Rol: ${escapeHtml(p.role || 'Colaborador')}</p>
+                                <div class="border-l-2 border-indigo-600 pl-2.5 py-1 bg-white rounded-r shadow-xs">
+                                    <p class="font-bold text-slate-900 text-[11px]">${i+1}. ${escapeHtml(p.name)}</p>
+                                    <p class="text-[10px] text-slate-500 truncate">${escapeHtml(p.email || 'Sin correo registrado')}</p>
+                                    <p class="text-[10px] font-bold text-indigo-700 mt-0.5">Rol: ${escapeHtml(p.role || 'Colaborador')}</p>
                                 </div>
                             `).join('')}
                         </div>
                     </div>
 
-                    <!-- Proyecto Seleccionado (Idea Ganadora) -->
-                    <div class="border-2 border-amber-500 bg-amber-50/40 p-5 rounded-xl print-avoid-break">
+                    <!-- 2. Proyecto Seleccionado (Idea Ganadora) -->
+                    <div class="report-card print-avoid-break border-2 border-amber-500 bg-amber-50/50 p-4 rounded-xl">
                         <div class="flex items-center justify-between mb-2">
-                            <span class="text-[10px] font-black uppercase tracking-wider bg-amber-500 text-white px-2 py-0.5 rounded">
-                                ⭐ IDEA SELECCIONADA PARA EL CURSO
+                            <span class="text-[10px] font-black uppercase tracking-wider bg-amber-500 text-white px-2.5 py-0.5 rounded shadow-xs">
+                                ⭐ IDEA GANADORA SELECCIONADA PARA EL CURSO
                             </span>
-                            <span class="text-xs font-bold text-amber-900">${maxVotes} Votos del Grupo</span>
+                            <span class="text-xs font-black text-amber-900 bg-amber-100 px-2 py-0.5 rounded-full">${maxVotes || 0} Votos del Grupo</span>
                         </div>
                         
-                        <h2 class="text-lg font-black text-slate-950 mb-1">${escapeHtml(winner.idea.title || 'Proyecto Sin Título')}</h2>
-                        <p class="text-[11px] font-semibold text-slate-600 mb-2">Ideada inicialmente por: ${escapeHtml(winner.name)}</p>
+                        <h2 class="text-base font-black text-slate-950 mb-0.5">${escapeHtml((winner.idea && winner.idea.title) || 'Proyecto Sin Título')}</h2>
+                        <p class="text-[11px] font-semibold text-slate-600 mb-2">Propuesta inicial de: <strong class="text-slate-900">${escapeHtml(winner.name)}</strong></p>
                         
-                        <p class="text-xs text-slate-800 leading-relaxed mb-3">
-                            ${escapeHtml(winner.idea.description || 'Sin descripción detallada.')}
+                        <p class="text-xs text-slate-800 leading-relaxed mb-3 bg-white/90 p-2.5 rounded-lg border border-amber-200">
+                            ${escapeHtml((winner.idea && winner.idea.description) || 'Sin descripción detallada.')}
                         </p>
 
-                        <div class="grid grid-cols-3 gap-2 bg-white p-3 rounded-lg border border-amber-200 text-[10px] mb-3">
-                            <div><strong class="text-indigo-800">Sector:</strong><br>${escapeHtml(sText)}</div>
-                            <div><strong class="text-teal-800">Necesidad:</strong><br>${escapeHtml(nText)}</div>
-                            <div><strong class="text-pink-800">Tendencia:</strong><br>${escapeHtml(tText)}</div>
+                        <div class="grid grid-cols-3 gap-2 bg-white p-2.5 rounded-lg border border-amber-200 text-[10px] mb-2.5">
+                            <div><strong class="text-indigo-800">Sector:</strong><br><span class="text-slate-700">${escapeHtml(sText)}</span></div>
+                            <div><strong class="text-teal-800">Necesidad:</strong><br><span class="text-slate-700">${escapeHtml(nText)}</span></div>
+                            <div><strong class="text-pink-800">Tendencia:</strong><br><span class="text-slate-700">${escapeHtml(tText)}</span></div>
                         </div>
 
-                        <div class="text-[11px] text-slate-700 pt-2 border-t border-amber-200">
-                            <strong>Segmento / Público Objetivo:</strong> ${escapeHtml(winner.idea.target || 'Público general')}
+                        <div class="text-[11px] text-slate-700 pt-1.5 border-t border-amber-200 flex items-center justify-between">
+                            <div><strong>Segmento / Público Objetivo:</strong> ${escapeHtml((winner.idea && winner.idea.target) || 'Público general')}</div>
                         </div>
                     </div>
 
-                    <!-- Justificación y Plan de Trabajo -->
-                    <div class="grid grid-cols-2 gap-4 text-xs print-avoid-break">
-                        <div class="border border-slate-200 p-3 rounded-xl bg-white">
-                            <h4 class="font-bold text-slate-800 mb-1 text-[11px] uppercase tracking-wider">Justificación de la Elección:</h4>
+                    <!-- 3. Justificación y Plan de Trabajo -->
+                    <div class="report-card print-avoid-break grid grid-cols-2 gap-3 text-xs">
+                        <div class="border border-slate-200 p-3 rounded-xl bg-slate-50/50">
+                            <h4 class="font-bold text-slate-800 mb-1 text-[10px] uppercase tracking-wider flex items-center gap-1">
+                                <span>💡</span> <span>Justificación de la Elección:</span>
+                            </h4>
                             <p class="text-slate-600 text-[11px] leading-relaxed italic">
-                                "${escapeHtml(workshopState.projectJustification || 'No registrada.')}"
+                                "${escapeHtml(workshopState.projectJustification || 'Propuesta elegida por su potencial innovador, viabilidad técnica y relevancia de mercado.')}"
                             </p>
                         </div>
-                        <div class="border border-slate-200 p-3 rounded-xl bg-white">
-                            <h4 class="font-bold text-slate-800 mb-1 text-[11px] uppercase tracking-wider">Próximo Hito Académico:</h4>
-                            <p class="text-slate-700 text-[11px] font-medium">
-                                ${escapeHtml(workshopState.projectNextStep || 'Validación de hipótesis y entrevistas.')}
+                        <div class="border border-slate-200 p-3 rounded-xl bg-slate-50/50">
+                            <h4 class="font-bold text-slate-800 mb-1 text-[10px] uppercase tracking-wider flex items-center gap-1">
+                                <span>🎯</span> <span>Próximo Hito Académico:</span>
+                            </h4>
+                            <p class="text-slate-700 text-[11px] font-semibold">
+                                ${escapeHtml(workshopState.projectNextStep || 'Validación de hipótesis y entrevistas con usuarios reales.')}
                             </p>
                         </div>
                     </div>
 
-                    <!-- Banco de Ideas Exploradas (Tabla Resumen) -->
-                    <div class="print-avoid-break">
-                        <h4 class="font-bold text-slate-800 text-xs mb-2 uppercase tracking-wider">2. Banco de Ideas Exploradas en el Taller:</h4>
-                        <table class="w-full text-[10px] border border-slate-200 rounded-lg overflow-hidden text-left">
-                            <thead class="bg-slate-100 text-slate-700 font-bold border-b">
-                                <tr>
-                                    <th class="p-2 w-8">#</th>
-                                    <th class="p-2">Propuesta</th>
-                                    <th class="p-2">Autor</th>
-                                    <th class="p-2">Combinación (A / B / C)</th>
-                                    <th class="p-2 text-center w-12">Votos</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-slate-100">
-                                ${workshopState.participants.map((p, i) => {
-                                    const sObj = (p.dice.group > 0 && p.dice.option > 0) ? SECTORS_DATA[p.dice.group].options[p.dice.option - 1] : null;
-                                    const st = sObj ? sObj.name : '-';
-                                    const nt = p.dice.need > 0 ? NEEDS_DATA[p.dice.need - 1].split('(')[0] : '-';
-                                    const tt = p.dice.trend > 0 ? TRENDS_DATA[p.dice.trend - 1].split('(')[0] : '-';
-                                    const isW = p.id === winnerId;
-                                    return `
-                                        <tr class="${isW ? 'bg-amber-50/70 font-semibold' : ''}">
-                                            <td class="p-2 text-slate-500">${i+1}</td>
-                                            <td class="p-2">${escapeHtml(p.idea.title || 'Sin Título')} ${isW ? '<span class="text-amber-700 font-bold">(Elegida)</span>' : ''}</td>
-                                            <td class="p-2 text-slate-600">${escapeHtml(p.name)}</td>
-                                            <td class="p-2 text-slate-500 text-[9px]">${escapeHtml(st)} / ${escapeHtml(nt)} / ${escapeHtml(tt)}</td>
-                                            <td class="p-2 text-center font-bold">${voteCounts[p.id] || 0}</td>
-                                        </tr>
-                                    `;
-                                }).join('')}
-                            </tbody>
-                        </table>
+                    <!-- 4. Banco de Ideas Exploradas (Tabla Resumen) -->
+                    <div class="report-card print-avoid-break">
+                        <h4 class="font-bold text-slate-800 text-xs mb-1.5 uppercase tracking-wider flex items-center gap-1">
+                            <span>📊</span> <span>2. Banco de Ideas Exploradas en el Taller:</span>
+                        </h4>
+                        <div class="border border-slate-200 rounded-xl overflow-hidden shadow-none">
+                            <table class="w-full text-[10px] text-left">
+                                <thead class="bg-slate-100 text-slate-700 font-bold border-b border-slate-200">
+                                    <tr>
+                                        <th class="py-2 px-2.5 w-7 text-center">#</th>
+                                        <th class="py-2 px-2.5">Propuesta</th>
+                                        <th class="py-2 px-2.5">Autor</th>
+                                        <th class="py-2 px-2.5">Combinación (A / B / C)</th>
+                                        <th class="py-2 px-2.5 text-center w-12">Votos</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-100">
+                                    ${workshopState.participants.map((p, i) => {
+                                        const sObj = (p.dice.group > 0 && p.dice.option > 0 && SECTORS_DATA[p.dice.group]) ? SECTORS_DATA[p.dice.group].options[p.dice.option - 1] : null;
+                                        const st = sObj ? sObj.name : '-';
+                                        const nt = (p.dice.need > 0 && NEEDS_DATA[p.dice.need - 1]) ? NEEDS_DATA[p.dice.need - 1].split('(')[0] : '-';
+                                        const tt = (p.dice.trend > 0 && TRENDS_DATA[p.dice.trend - 1]) ? TRENDS_DATA[p.dice.trend - 1].split('(')[0] : '-';
+                                        const isW = p.id === winnerId;
+                                        return `
+                                            <tr class="print-avoid-break ${isW ? 'bg-amber-50/70 font-semibold' : ''}">
+                                                <td class="py-1.5 px-2.5 text-center text-slate-500">${i+1}</td>
+                                                <td class="py-1.5 px-2.5 text-slate-900">${escapeHtml((p.idea && p.idea.title) || 'Sin Título')} ${isW ? '<span class="text-amber-700 font-bold text-[9px] ml-1">★ Ganadora</span>' : ''}</td>
+                                                <td class="py-1.5 px-2.5 text-slate-600">${escapeHtml(p.name)}</td>
+                                                <td class="py-1.5 px-2.5 text-slate-500 text-[9px]">${escapeHtml(st)} / ${escapeHtml(nt)} / ${escapeHtml(tt)}</td>
+                                                <td class="py-1.5 px-2.5 text-center font-bold ${isW ? 'text-amber-900' : 'text-slate-700'}">${voteCounts[p.id] || 0}</td>
+                                            </tr>
+                                        `;
+                                    }).join('')}
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
 
-                    <!-- Sección de Firmas de Compromiso -->
-                    <div class="pt-4 border-t border-slate-200 print-avoid-break">
-                        <p class="text-[10px] uppercase font-bold text-slate-400 mb-6 text-center tracking-wider">
+                    <!-- 5. Sección de Firmas de Compromiso -->
+                    <div class="report-card print-avoid-break pt-3 border-t border-slate-200">
+                        <p class="text-[10px] uppercase font-bold text-slate-500 mb-4 text-center tracking-wider">
                             Compromiso y Conformidad del Equipo de Innovación:
                         </p>
                         <div class="grid grid-cols-4 gap-4 text-center">
                             ${workshopState.participants.map(p => `
-                                <div>
-                                    <div class="border-b border-slate-400 h-8 mb-1"></div>
-                                    <p class="font-bold text-slate-800 text-[10px]">${escapeHtml(p.name)}</p>
-                                    <p class="text-[9px] text-slate-400 leading-none">${escapeHtml(p.role.split('/')[0].trim())}</p>
+                                <div class="print-avoid-break">
+                                    <div class="border-b border-slate-400 h-7 mb-1.5"></div>
+                                    <p class="font-bold text-slate-800 text-[10px] truncate">${escapeHtml(p.name)}</p>
+                                    <p class="text-[9px] text-slate-500 leading-none mt-0.5">${escapeHtml((p.role || 'Integrante').split('/')[0].trim())}</p>
                                 </div>
                             `).join('')}
                         </div>
@@ -2893,7 +2928,13 @@ Cada participante debe buscar su nombre, hacer clic en su enlace personalizado y
 
         function openReportModal() {
             const html = buildReportHTML();
-            document.getElementById('report-document-sheet').innerHTML = html;
+            const previewEl = document.getElementById('report-document-sheet');
+            if (previewEl) previewEl.innerHTML = html;
+            
+            // Sincronizar también el contenedor exclusivo de impresión directa
+            const exportContainer = document.getElementById('pdf-export-container');
+            if (exportContainer) exportContainer.innerHTML = html;
+
             document.getElementById('report-modal').classList.remove('hidden');
         }
 
@@ -2901,26 +2942,64 @@ Cada participante debe buscar su nombre, hacer clic en su enlace personalizado y
             document.getElementById('report-modal').classList.add('hidden');
         }
 
-        // Descarga directa a PDF usando html2pdf.js
+        // Descarga directa a PDF usando html2pdf.js con ajuste milimétrico y sin espacios en blanco
         function downloadPDF() {
-            const element = document.createElement('div');
-            element.innerHTML = buildReportHTML();
-            element.style.padding = '20px';
-            element.style.backgroundColor = '#ffffff';
-            element.style.fontFamily = 'Helvetica, Arial, sans-serif';
+            // Eliminar sandbox temporal previo si existiese
+            const prevSandbox = document.getElementById('pdf-render-sandbox');
+            if (prevSandbox) prevSandbox.remove();
+
+            // Crear un sandbox de renderizado fijo en coordenadas (0, 0)
+            // Esto elimina por completo el espacio en blanco provocado por el scroll de html2canvas
+            const sandbox = document.createElement('div');
+            sandbox.id = 'pdf-render-sandbox';
+            sandbox.innerHTML = buildReportHTML();
+
+            sandbox.style.position = 'fixed';
+            sandbox.style.top = '0px';
+            sandbox.style.left = '0px';
+            sandbox.style.width = '794px'; // Ancho A4 exacto a 96 DPI
+            sandbox.style.padding = '24px';
+            sandbox.style.boxSizing = 'border-box';
+            sandbox.style.backgroundColor = '#ffffff';
+            sandbox.style.fontFamily = 'ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif';
+            sandbox.style.zIndex = '-99999';
+            sandbox.style.pointerEvents = 'none';
+
+            document.body.appendChild(sandbox);
+
+            const groupClean = (workshopState.groupCode || 'G01').replace(/[^a-zA-Z0-9_-]/g, '');
+            const teamClean = (workshopState.teamName || 'Equipo').replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_-]/g, '');
+            const filename = `Informe_Innovacion_${groupClean}_${teamClean}.pdf`;
 
             const opt = {
-                margin:       10,
-                filename:     `Informe_Innovacion_${workshopState.groupCode}_${workshopState.teamName.replace(/\s+/g, '_')}.pdf`,
+                margin:       [8, 10, 8, 10], // mm: superior, izquierdo, inferior, derecho
+                filename:     filename,
                 image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { scale: 2, useCORS: true },
-                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+                html2canvas:  { 
+                    scale: 2, 
+                    useCORS: true, 
+                    allowTaint: true,
+                    scrollY: 0, 
+                    scrollX: 0,
+                    windowWidth: 794,
+                    logging: false 
+                },
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
+                pagebreak:    { 
+                    mode: ['avoid-all', 'css', 'legacy'], 
+                    avoid: ['.report-card', '.print-avoid-break', 'tr', 'table'] 
+                }
             };
 
             if (window.html2pdf) {
-                html2pdf().set(opt).from(element).save();
+                html2pdf().set(opt).from(sandbox).save().then(() => {
+                    if (sandbox.parentNode) sandbox.parentNode.removeChild(sandbox);
+                }).catch(err => {
+                    console.error("Error al exportar PDF con html2pdf:", err);
+                    if (sandbox.parentNode) sandbox.parentNode.removeChild(sandbox);
+                });
             } else {
-                // Respaldo por si no cargó el script de CDN
+                if (sandbox.parentNode) sandbox.parentNode.removeChild(sandbox);
                 window.print();
             }
         }
