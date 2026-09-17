@@ -54,19 +54,19 @@
 <body class="bg-slate-50 font-sans text-slate-800 min-h-screen flex flex-col">
 
     <!-- Header Principal (Oculto en Impresión) -->
-    <header class="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white py-4 px-4 shadow-md no-print sticky top-0 z-30">
-        <div class="max-w-6xl mx-auto flex flex-wrap items-center justify-between gap-4">
-            <div class="flex items-center gap-4">
+    <header class="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white py-3 px-4 shadow-md no-print relative z-10">
+        <div class="max-w-6xl mx-auto flex flex-wrap items-center justify-between gap-3">
+            <div class="flex items-center gap-3">
                 <img id="header-app-logo" src="https://i.imgur.com/cjfV02r.png" 
                      alt="Logo Innovación Con Clase" 
-                     class="h-12 w-auto bg-white p-1.5 rounded-lg shadow-inner"
+                     class="h-10 sm:h-12 w-auto bg-white p-1.5 rounded-lg shadow-inner"
                      onerror="if(typeof BRAND_LOGO_BASE64 !== 'undefined') this.src=BRAND_LOGO_BASE64;">
                 <div>
                     <div class="flex items-center gap-2">
-                        <h1 class="text-2xl font-black tracking-tight">IMAGINERÍA</h1>
-                        <span class="bg-indigo-600 text-indigo-100 text-xs px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider">Gerencia de la Innovación</span>
+                        <h1 class="text-xl sm:text-2xl font-black tracking-tight">IMAGINERÍA</h1>
+                        <span class="bg-indigo-600 text-indigo-100 text-[10px] sm:text-xs px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider">Gerencia de la Innovación</span>
                     </div>
-                    <p id="header-team-title" class="text-xs font-light text-indigo-200">Taller de Ideación • Ficha y Memoria del Proyecto</p>
+                    <p id="header-team-title" class="text-[11px] sm:text-xs font-light text-indigo-200">Taller de Ideación • Ficha y Memoria del Proyecto</p>
                 </div>
             </div>
 
@@ -76,10 +76,10 @@
                 <button id="btn-admin-access" onclick="requestAdminAccess()" class="hidden bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black px-3.5 py-2 rounded-xl shadow-md transition flex items-center gap-1.5 ring-2 ring-amber-300/50" title="Panel exclusivo para el docente">
                     👑 <span>Modo Administrador</span>
                 </button>
-                <button onclick="openReportModal()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-2 rounded-xl font-bold shadow-sm transition flex items-center gap-1.5">
+                <button onclick="openReportModal()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-1.5 sm:py-2 rounded-xl font-bold shadow-sm transition flex items-center gap-1.5">
                     📄 <span>Ver Informe PDF</span>
                 </button>
-                <button onclick="confirmReset()" class="bg-slate-800 hover:bg-rose-700 text-slate-300 hover:text-white px-2.5 py-2 rounded-xl font-medium transition flex items-center gap-1" title="Reiniciar taller">
+                <button onclick="confirmReset()" class="bg-slate-800 hover:bg-rose-700 text-slate-300 hover:text-white px-2.5 py-1.5 sm:py-2 rounded-xl font-medium transition flex items-center gap-1" title="Reiniciar taller">
                     🔄 <span>Nuevo Taller</span>
                 </button>
             </div>
@@ -87,7 +87,7 @@
     </header>
 
     <!-- Banner de Bienvenida para Estudiante con Enlace Personalizado -->
-    <div id="student-welcome-banner" class="hidden bg-gradient-to-r from-indigo-950 via-indigo-900 to-slate-950 text-white px-4 py-3.5 shadow-md border-b border-indigo-700/60 no-print transition-all">
+    <div id="student-welcome-banner" class="hidden bg-gradient-to-r from-indigo-950 via-indigo-900 to-slate-950 text-white px-4 py-3 shadow-md border-b border-indigo-700/60 no-print transition-all">
         <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
             <div class="flex items-center gap-3">
                 <span class="text-2xl animate-bounce">👋</span>
@@ -100,7 +100,7 @@
                     </p>
                 </div>
             </div>
-            <div class="flex items-center gap-2">
+            <div class="flex items-center gap-2 shrink-0">
                 <button onclick="goToPhase(2)" class="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs px-3.5 py-1.5 rounded-xl shadow transition flex items-center gap-1">
                     🎲 <span>Ir a mi Turno de Ideación</span>
                 </button>
@@ -115,7 +115,7 @@
     </div>
 
     <!-- Barra de Pasos / Stepper (Fases 1 a 5) -->
-    <nav class="bg-white border-b border-slate-200 px-4 py-3 no-print sticky top-[72px] z-20 shadow-sm">
+    <nav class="bg-white border-b border-slate-200 px-4 py-2.5 no-print sticky top-0 z-30 shadow-sm">
         <div class="max-w-6xl mx-auto flex items-center justify-between text-xs sm:text-sm font-semibold overflow-x-auto gap-2">
             <button onclick="goToPhase(1)" id="step-btn-1" class="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-indigo-700 bg-indigo-50 shrink-0 transition">
                 <span class="w-5 h-5 rounded-full bg-indigo-600 text-white flex items-center justify-center text-xs">1</span>
@@ -1339,8 +1339,10 @@
         function parseUrlParams() {
             const params = new URLSearchParams(window.location.search);
             const groupParam = params.get('group');
-            const studentParam = params.get('student');
-            const teamParam = params.get('team');
+            const rawStudent = params.get('student');
+            const studentParam = rawStudent ? decodeURIComponent(rawStudent.replace(/\+/g, ' ')).trim() : null;
+            const rawTeam = params.get('team');
+            const teamParam = rawTeam ? decodeURIComponent(rawTeam.replace(/\+/g, ' ')).trim() : null;
             const scriptUrlParam = params.get('url') || params.get('scriptUrl');
             const phaseParam = params.get('phase');
             const adminParam = params.get('admin') || params.get('docente');
@@ -1360,10 +1362,11 @@
 
             let modified = false;
 
-            const courseParam = params.get('curso') || params.get('course') || params.get('nrc');
+            const rawCourse = params.get('curso') || params.get('course') || params.get('nrc');
+            const courseParam = rawCourse ? decodeURIComponent(rawCourse.replace(/\+/g, ' ')).trim() : null;
             if (courseParam) {
-                workshopState.courseName = courseParam.trim();
-                adminState.courseName = courseParam.trim();
+                workshopState.courseName = courseParam;
+                adminState.courseName = courseParam;
                 const courseInp = document.getElementById('input-course-name');
                 if (courseInp) courseInp.value = workshopState.courseName;
                 const adminCourseInp = document.getElementById('admin-course-input');
@@ -1372,14 +1375,29 @@
             }
 
             if (groupParam) {
-                workshopState.groupCode = groupParam.trim();
+                const cleanGroup = groupParam.trim();
+                // Si el grupo es diferente al que estaba en localStorage, resetear para evitar mezclas con grupos previos
+                if (workshopState.groupCode !== cleanGroup) {
+                    workshopState.groupCode = cleanGroup;
+                    for (let i = 0; i < 4; i++) {
+                        workshopState.participants[i] = {
+                            id: i + 1,
+                            name: `Participante ${i + 1}`,
+                            email: '',
+                            role: INNOVATION_ROLES[i % INNOVATION_ROLES.length],
+                            dice: { group: 0, option: 0, need: 0, trend: 0 },
+                            idea: { title: '', description: '', target: '' },
+                            votes: []
+                        };
+                    }
+                }
                 const codeInp = document.getElementById('input-group-code');
                 if (codeInp) codeInp.value = workshopState.groupCode;
                 modified = true;
             }
 
             if (teamParam) {
-                workshopState.teamName = teamParam.trim();
+                workshopState.teamName = teamParam;
                 const teamInp = document.getElementById('input-team-name');
                 if (teamInp) teamInp.value = workshopState.teamName;
                 modified = true;
@@ -1409,7 +1427,7 @@
 
             // Si viene el nombre de un estudiante específico en la URL
             if (studentParam) {
-                const sName = studentParam.trim();
+                const sName = studentParam;
                 let foundIndex = workshopState.participants.findIndex(p => p.name.toLowerCase() === sName.toLowerCase());
                 
                 if (foundIndex === -1) {
@@ -1427,6 +1445,12 @@
                 }
 
                 workshopState.activeParticipantIndex = foundIndex;
+
+                // Salto automático a Fase 2 (Ideación y Dados) para el estudiante si no se forzó otra fase
+                if (!phaseParam) {
+                    workshopState.currentPhase = 2;
+                    modified = true;
+                }
 
                 // Actualizar y mostrar el Banner de Bienvenida del Estudiante
                 const banner = document.getElementById('student-welcome-banner');
@@ -1746,6 +1770,8 @@
             return window.location.href.split('?')[0].split('#')[0];
         }
 
+        const DEFAULT_APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyswH779w7PXOi8UCAYwm7ADgiCReG_WRTYY2yIxIKj5OTkTQi8y9qhHfuSeBs2ljvoJw/exec";
+
         function buildStudentDirectLink(groupCode, studentName, teamName) {
             const baseUrl = getAppBaseUrl();
             const sep = baseUrl.includes('?') ? '&' : '?';
@@ -1755,7 +1781,11 @@
             params.set('group', groupCode);
             if (studentName) params.set('student', studentName);
             if (teamName) params.set('team', teamName);
-            if (workshopState.appsScriptUrl) params.set('url', workshopState.appsScriptUrl);
+            params.set('phase', '2');
+            // Solo agregar url si difiere de la oficial integrada, para evitar enlaces rotos o divididos por WhatsApp
+            if (workshopState.appsScriptUrl && workshopState.appsScriptUrl !== DEFAULT_APPS_SCRIPT_URL) {
+                params.set('url', workshopState.appsScriptUrl);
+            }
             return `${baseUrl}${sep}${params.toString()}`;
         }
 
