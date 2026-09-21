@@ -1646,15 +1646,20 @@
             if (countEl) countEl.innerText = "⏳...";
 
             try {
-                const res = await fetch(url);
+                const sep = url.includes('?') ? '&' : '?';
+                const res = await fetch(`${url}${sep}_t=${Date.now()}`, { cache: 'no-store' });
                 const data = await res.json();
                 if (data.status === 'success') {
-                    // Caso 1: Los grupos ya fueron sorteados en la hoja de Google Sheets
-                    if (data.groups && Object.keys(data.groups).length > 0) {
+                    // Si los grupos detectados son roles debido al bug previo de columnas, tratar como Caso 2 (sin grupo asignado)
+                    const rawKeys = Object.keys(data.groups || {});
+                    const hasRoleAsGroup = rawKeys.some(k => k.toLowerCase().includes('líder') || k.toLowerCase().includes('especialista') || k.toLowerCase().includes('investigador'));
+
+                    // Caso 1: Los grupos ya fueron sorteados en la hoja de Google Sheets y son grupos válidos (G-01, etc.)
+                    if (data.groups && rawKeys.length > 0 && !hasRoleAsGroup) {
                         const groups = [];
                         const lines = [];
 
-                        Object.keys(data.groups).sort().forEach(gCode => {
+                        rawKeys.sort().forEach(gCode => {
                             const members = data.groups[gCode] || [];
                             const groupMembers = [];
 
@@ -2281,7 +2286,7 @@ Cada participante debe buscar su nombre, hacer clic en su enlace personalizado y
 
         async function cargarGrupoDesdeGoogleSheets(silent = false) {
             let url = document.getElementById('input-apps-script-url').value.trim() || workshopState.appsScriptUrl;
-            const code = document.getElementById('input-group-code').value.trim() || 'G-01';
+            const code = (document.getElementById('input-group-code').value.trim() || 'G-01');
             const statusEl = document.getElementById('roster-status-msg');
 
             if (!url) {
@@ -2299,13 +2304,43 @@ Cada participante debe buscar su nombre, hacer clic en su enlace personalizado y
             }
 
             try {
-                const activeCourse = (workshopState.courseName || '').trim();
-                const fetchUrl = activeCourse ? `${url}${url.includes('?') ? '&' : '?'}curso=${encodeURIComponent(activeCourse)}` : url;
-                const res = await fetch(fetchUrl);
+                const courseInp = document.getElementById('input-course-name');
+                const activeCourse = (courseInp && courseInp.value.trim()) ? courseInp.value.trim() : (workshopState.courseName || '').trim();
+                const sep = url.includes('?') ? '&' : '?';
+                let fetchUrl = `${url}${sep}_t=${Date.now()}`;
+                if (activeCourse) {
+                    fetchUrl += `&curso=${encodeURIComponent(activeCourse)}`;
+                }
+
+                const res = await fetch(fetchUrl, { cache: 'no-store' });
                 const data = await res.json();
 
-                if (data.status === 'success' && data.groups) {
-                    const members = data.groups[code];
+                if (data.status === 'success') {
+                    let members = (data.groups && data.groups[code]) ? data.groups[code] : null;
+
+                    // 1. Intento de búsqueda flexible por normalización numérica (ej: 'G-01' vs 'G-1' vs '1')
+                    if (!members && data.groups) {
+                        const cleanCode = code.toLowerCase().replace(/[^0-9]/g, '');
+                        const foundKey = Object.keys(data.groups).find(k => {
+                            if (k.toLowerCase() === code.toLowerCase()) return true;
+                            const kClean = k.toLowerCase().replace(/[^0-9]/g, '');
+                            return cleanCode && kClean === cleanCode;
+                        });
+                        if (foundKey) members = data.groups[foundKey];
+                    }
+
+                    // 2. Intento de búsqueda en lista plana de estudiantes
+                    if (!members && Array.isArray(data.students) && data.students.length > 0) {
+                        const cleanCode = code.toLowerCase().replace(/[^0-9]/g, '');
+                        const fromStudents = data.students.filter(s => {
+                            const g = (s.group || '').toString().toLowerCase().trim();
+                            if (g === code.toLowerCase()) return true;
+                            const gClean = g.replace(/[^0-9]/g, '');
+                            return cleanCode && gClean === cleanCode;
+                        });
+                        if (fromStudents.length > 0) members = fromStudents;
+                    }
+
                     if (members && members.length > 0) {
                         members.forEach((m, i) => {
                             if (i < 4) {
@@ -2322,7 +2357,7 @@ Cada participante debe buscar su nombre, hacer clic en su enlace personalizado y
 
                         saveToStorage();
 
-                        // Si hay un estudiante activo indicado en el banner, sincronizar rol
+                        // Sincronizar rol si hay un estudiante activo en el banner
                         const bannerName = document.getElementById('banner-student-name');
                         if (bannerName && bannerName.innerText) {
                             const curName = bannerName.innerText.trim();
@@ -2340,16 +2375,28 @@ Cada participante debe buscar su nombre, hacer clic en su enlace personalizado y
                             playBeep(800, 0.1);
                         }
                     } else if (!silent && statusEl) {
-                        statusEl.innerText = `⚠️ No se encontraron integrantes asignados al código "${code}". Asegúrate de haber corrido el sorteo en Google Sheets.`;
-                        statusEl.className = "text-xs font-bold text-amber-700 mb-2";
+                        // Diagnóstico inteligente
+                        const rawKeys = Object.keys(data.groups || {});
+                        const isRolesBug = rawKeys.some(k => k.toLowerCase().includes('líder') || k.toLowerCase().includes('especialista') || k.toLowerCase().includes('investigador'));
+
+                        if (isRolesBug) {
+                            statusEl.innerHTML = `⚠️ <strong>Desalineación en Google Sheets:</strong> Las columnas <em>Grupo</em> y <em>Rol</em> se cruzaron. Por favor actualiza el código en Google Apps Script y vuelve a ejecutar <em>'2. Sortear Grupos Aleatorios'</em> en la hoja de cálculo.`;
+                            statusEl.className = "text-xs font-semibold text-rose-700 mb-2 bg-rose-50 p-2.5 rounded-xl border border-rose-200";
+                        } else if (rawKeys.length > 0) {
+                            statusEl.innerText = `⚠️ No se encontró el grupo "${code}". Grupos disponibles en Sheets: ${rawKeys.join(', ')}`;
+                            statusEl.className = "text-xs font-bold text-amber-700 mb-2";
+                        } else {
+                            statusEl.innerText = `⚠️ No se encontraron integrantes asignados al código "${code}". Asegúrate de haber corrido el sorteo en Google Sheets.`;
+                            statusEl.className = "text-xs font-bold text-amber-700 mb-2";
+                        }
                     }
                 } else if (!silent && statusEl) {
-                    statusEl.innerText = `⚠️ No se pudo leer la lista de grupos. Revisa la URL del Apps Script.`;
+                    statusEl.innerText = `⚠️ No se pudo leer la lista de grupos: ${data.message || 'Revisa la URL de Apps Script'}`;
                     statusEl.className = "text-xs font-bold text-rose-700 mb-2";
                 }
             } catch (err) {
                 if (!silent && statusEl) {
-                    statusEl.innerText = `Error de conexión: Revisa los permisos de la aplicación web de Apps Script (debe estar en 'Cualquier persona').`;
+                    statusEl.innerText = `Error de conexión (${err.message}): Revisa que la URL de Apps Script termine en /exec y tenga permisos en 'Cualquier persona'.`;
                     statusEl.className = "text-xs font-bold text-rose-700 mb-2";
                 }
             }
