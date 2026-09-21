@@ -2329,7 +2329,7 @@ Cada participante debe buscar su nombre, hacer clic en su enlace personalizado y
                         if (foundKey) members = data.groups[foundKey];
                     }
 
-                    // 2. Intento de búsqueda en lista plana de estudiantes
+                    // 2. Intento de búsqueda en lista plana de estudiantes por código
                     if (!members && Array.isArray(data.students) && data.students.length > 0) {
                         const cleanCode = code.toLowerCase().replace(/[^0-9]/g, '');
                         const fromStudents = data.students.filter(s => {
@@ -2339,6 +2339,28 @@ Cada participante debe buscar su nombre, hacer clic en su enlace personalizado y
                             return cleanCode && gClean === cleanCode;
                         });
                         if (fromStudents.length > 0) members = fromStudents;
+                    }
+
+                    // 3. Fallback inteligente: si aún no tienen código G- asignado en la hoja pero existen estudiantes registrados
+                    if (!members && Array.isArray(data.students) && data.students.length > 0) {
+                        const rawNum = code.replace(/[^0-9]/g, '');
+                        const groupNum = rawNum ? parseInt(rawNum, 10) : 1;
+                        const startIndex = Math.max(0, (groupNum - 1) * 4);
+                        const slice = data.students.slice(startIndex, startIndex + 4);
+
+                        if (slice.length > 0) {
+                            const ROLES_FALLBACK = [
+                                "Líder de Proyecto / Product Owner",
+                                "Especialista de Negocio / Finanzas",
+                                "Investigador de Usuario / Design Thinking",
+                                "Especialista Técnico / Factibilidad"
+                            ];
+                            members = slice.map((s, idx) => ({
+                                name: s.name,
+                                email: s.email || '',
+                                role: (s.role && !s.role.toLowerCase().includes('participante')) ? s.role : ROLES_FALLBACK[idx % ROLES_FALLBACK.length]
+                            }));
+                        }
                     }
 
                     if (members && members.length > 0) {
